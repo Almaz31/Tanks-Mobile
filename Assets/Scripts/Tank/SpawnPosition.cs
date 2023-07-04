@@ -1,18 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class SpawnPosition : MonoBehaviour
+public class SpawnPosition : NetworkBehaviour
 {
     public static SpawnPosition instance;
-    public List<Transform> spawnPoints;
-    private List<Transform> copySpawnPoints;
+    [SerializeField]private List<Transform> spawnPoints;
+    private List<Transform> copySpawnPoints=new List<Transform>();
 
+    private void Start()
+    {
+        copySpawnPoints = new List<Transform>(spawnPoints);
+    }
     private void Awake()
     {
         if (instance == null)
             instance = this;
-        copySpawnPoints = new List<Transform>(spawnPoints);
+        
     }
     public Vector2 GetSpawnPoint()
     {

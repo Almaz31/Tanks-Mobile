@@ -1,12 +1,14 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour,IDesctructeble
+public class Bullet : NetworkBehaviour,IDesctructeble
 {
     public float Speed=20f;
     public float BulletLife=7f;
     public float Timer;
     private Rigidbody2D rb;
    public  Vector3 lastDirection;
+    public Shooting parent;
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -39,12 +41,19 @@ public class Bullet : MonoBehaviour,IDesctructeble
             Shooting.instance.BulletCount--;
             
         }
+        else if (collision.collider.CompareTag("Bullet")){
+            Destroy(this.gameObject);
+            Destroy(collision.gameObject);
+            Shooting.instance.BulletCount--;
+        }
         else
             return;
     }
     public void Destroying()
     {
-        Destroy(this.gameObject);
+        if(!IsOwner) return;
+        //Destroy(this.gameObject);
+        parent.DestroyServerRpc();
     }
 
 }

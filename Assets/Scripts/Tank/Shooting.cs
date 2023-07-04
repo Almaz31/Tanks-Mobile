@@ -1,34 +1,51 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Shooting : MonoBehaviour
+public class Shooting : NetworkBehaviour
 {
     public static Shooting instance;
     public GameObject bulletPrefab;
     public int numberOfBullets = 5;
     public int BulletCount;
+    public Transform firePoint;
+    [SerializeField] private List<GameObject> spawnedBullets=new List<GameObject>();
 
-    private void Awake()
+    private void Update()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
+        if (Input.GetKeyDown(KeyCode.Space))
+            Shoot();
     }
-    public void Shoot(Transform firePoint)
+    public void Shoot()
     {
-        
+        if (!IsOwner) return;
         if (BulletCount < numberOfBullets)
         {
-            GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-            Rigidbody2D rbBullet = bullet.GetComponent<Rigidbody2D>();
-            Bullet bulletCode = rbBullet.GetComponent<Bullet>();
-            float bulletSpeed = bulletCode.Speed;
-            rbBullet.AddForce(firePoint.up * bulletSpeed, ForceMode2D.Impulse);
-            BulletCount++;
+            ShootServerRpc();
 
         }
+        
        
+    }
+    [ServerRpc]
+    private void ShootServerRpc()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        spawnedBullets.Add(bullet);
+        bullet.GetComponent<Bullet>().parent = this;
+        bullet.GetComponent<NetworkObject>().Spawn();
+        Rigidbody2D rbBullet = bullet.GetComponent<Rigidbody2D>();
+        float bulletSpeed = rbBullet.GetComponent<Bullet>().Speed;
+        rbBullet.AddForce(firePoint.up * bulletSpeed, ForceMode2D.Impulse);
+        BulletCount++;
+    }
+    [ServerRpc(RequireOwnership =false)]
+    public void DestroyServerRpc()
+    {
+        GameObject toDestroy = spawnedBullets[0];
+        toDestroy.GetComponent<NetworkObject>().Despawn();
+        spawnedBullets.Remove(toDestroy);
+        Destroy(toDestroy);
     }
 }
