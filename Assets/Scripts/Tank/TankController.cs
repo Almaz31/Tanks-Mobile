@@ -23,6 +23,9 @@ public class TankController : NetworkBehaviour, IDesctructeble
     public Animator anim;
     private bool isAnimating;
 
+    [Header("Vision")]
+    [SerializeField] private PlayerVisual playerVisual;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +36,8 @@ public class TankController : NetworkBehaviour, IDesctructeble
             if (joystick == null)
                 joystick = FindObjectOfType<FloatingJoystick>().GetComponent<FloatingJoystick>();
         }
+        PlayerData playerData = TanksMobileMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
+        playerVisual.SetPlayerColor(TanksMobileMultiplayer.Instance.GetPlayerColor(playerData.colorId));
     }
 
     // Update is called once per frame

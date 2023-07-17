@@ -49,6 +49,7 @@ GameObject:
   - component: {fileID: 2840318596802563619}
   - component: {fileID: 5106838440627819082}
   - component: {fileID: 1293279127616599238}
+  - component: {fileID: 5184642907708368125}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Player
@@ -161,7 +162,8 @@ MonoBehaviour:
   speedRotation: 3
   toleranceAngle: 25
   firePoint: {fileID: 2228245294898873763}
-  anim: {fileID: 0}
+  anim: {fileID: 1034436429085639536}
+  playerVisual: {fileID: 5184642907708368125}
 --- !u!212 &1315860431261446392
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -315,3 +317,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TransitionStateInfoList: []
   m_Animator: {fileID: 1034436429085639536}
+--- !u!114 &5184642907708368125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8059826903960028562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e71ffdb9967568449068b0544a2a569, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

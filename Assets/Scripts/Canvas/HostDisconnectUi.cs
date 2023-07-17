@@ -8,6 +8,13 @@ public class HostDisconnectUi : MonoBehaviour
 {
     [SerializeField] private Button returnToMenuButton;
 
+    private void Awake()
+    {
+        returnToMenuButton.onClick.AddListener(() =>
+        {
+            SceneLoader.Load(SceneLoader.Scene.MainMenuScene);
+        });
+    }
     private void Start()
     {
         NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisconnectCallback;
@@ -27,5 +34,9 @@ public class HostDisconnectUi : MonoBehaviour
     private void Hide()
     {
         gameObject.SetActive(false);
+    }
+    private void OnDestroy()
+    {
+        NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisconnectCallback;
     }
 }

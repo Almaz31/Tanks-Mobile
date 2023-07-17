@@ -27,7 +27,7 @@ public class GameSettings : NetworkBehaviour
     {
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            Transform playerTransform = Instantiate(playerPrefab);
+            Transform playerTransform = Instantiate(playerPrefab,SpawnPosition.instance.GetSpawnPoint(),Quaternion.identity);
             playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId,true);
         }
     }
