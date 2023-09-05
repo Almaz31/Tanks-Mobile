@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -7,9 +8,8 @@ using UnityEngine.SceneManagement;
 public class GameSettings : NetworkBehaviour
 {
     public static GameSettings instance;
-    public List<NetworkObject> playerList = new List<NetworkObject>();
-    private bool isStarting = true;
     [SerializeField] private Transform playerPrefab;
+    public event EventHandler OnGettingKill;
     private void Awake()
     {
         if (instance == null)
@@ -28,34 +28,20 @@ public class GameSettings : NetworkBehaviour
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
             Transform playerTransform = Instantiate(playerPrefab,SpawnPosition.instance.GetSpawnPoint(),Quaternion.identity);
-            playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId,true);
+            playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId,true); 
         }
+
     }
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
     {
         //Do something when client disconnect;
     }
-    private void IsLastPlayer()
+   
+    public void PlayerGetKill(ulong playerId)
     {
-        if(playerList.Count <=1&&!isStarting) {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-        Debug.Log(playerList);
-    }
-    public void AddPlayer(NetworkObject player)
-    {
-        playerList.Add(player);
-        if (playerList.Count > 1) isStarting = false;
-        IsLastPlayer();
-    }
-    public void RemovePlayer(NetworkObject player)
-    {
-        playerList.Remove(player);
-        IsLastPlayer();
-    }
-    public bool IsGameStarting()
-    {
-        return isStarting;
+        OnGettingKill?.Invoke(this, EventArgs.Empty);
+        PlayerData playerData = TanksMobileMultiplayer.Instance.GetPlayerDataFromClientId(playerId);
+        playerData.playerKills++;
     }
 }

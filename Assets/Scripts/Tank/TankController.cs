@@ -84,15 +84,6 @@ public class TankController : NetworkBehaviour, IDesctructeble
         {
             transform.rotation = transform.rotation;
         }
-
-        if (Quaternion.Angle(currentRotation, targetRotation) <= toleranceAngle)
-        {
-            rb.velocity = direction * Speed;
-        }
-        else
-        {
-            rb.velocity = Vector2.zero;
-        }
     }
     public void Move()
     {
@@ -128,16 +119,6 @@ public class TankController : NetworkBehaviour, IDesctructeble
         }
 
     }
-
-    public override void OnNetworkSpawn()
-    {
-        if(!IsOwner)return;
-        UpdatePositionServerRpc();
-        
-    }
-
-   
-
     public void Destroying()
     {
         
@@ -165,13 +146,7 @@ public class TankController : NetworkBehaviour, IDesctructeble
     {
         GetComponent<NetworkObject>().Despawn(gameObject);
         Destroy(gameObject);
-        GameSettings.instance.RemovePlayer(this.NetworkObject);
     }
-    [ServerRpc(RequireOwnership =false)]
-    private void UpdatePositionServerRpc()
-    {
-        Vector2 spawnPoint = SpawnPosition.instance.GetSpawnPoint();
-        transform.position = spawnPoint;
-    }
+
 
 }

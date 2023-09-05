@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class Shooting : NetworkBehaviour
 {
-    public static Shooting instance;
     public GameObject bulletPrefab;
     public int numberOfBullets = 5;
     public int BulletCount;
@@ -47,5 +48,13 @@ public class Shooting : NetworkBehaviour
         toDestroy.GetComponent<NetworkObject>().Despawn();
         spawnedBullets.Remove(toDestroy);
         Destroy(toDestroy);
+    }
+    public void BulletDestroyed()
+    {
+        BulletCount--;
+    }
+    public void GetKill()
+    {
+        GameSettings.instance.PlayerGetKill(OwnerClientId);
     }
 }

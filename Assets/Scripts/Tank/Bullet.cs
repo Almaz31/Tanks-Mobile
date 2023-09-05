@@ -20,7 +20,7 @@ public class Bullet : NetworkBehaviour,IDesctructeble
         if (Timer > BulletLife)
         {
             Destroy(gameObject);
-            Shooting.instance.BulletCount--;
+            parent.GetComponent<Shooting>().BulletDestroyed();
         }
 
     }
@@ -38,13 +38,13 @@ public class Bullet : NetworkBehaviour,IDesctructeble
             IDesctructeble destructible = collision.collider.GetComponent<IDesctructeble>();
             destructible.Destroying();
             Destroying();
-            Shooting.instance.BulletCount--;
-            
+            parent.GetComponent<Shooting>().BulletDestroyed();
+
         }
         else if (collision.collider.CompareTag("Bullet")){
             Destroy(this.gameObject);
             Destroy(collision.gameObject);
-            Shooting.instance.BulletCount--;
+            parent.GetComponent<Shooting>().BulletDestroyed();
         }
         else
             return;
