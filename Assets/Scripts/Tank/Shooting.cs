@@ -11,8 +11,14 @@ public class Shooting : NetworkBehaviour
     public int numberOfBullets = 5;
     public int BulletCount;
     public Transform firePoint;
+    public int freeId;
     [SerializeField] private List<GameObject> spawnedBullets=new List<GameObject>();
 
+
+    private void Start()
+    {
+        freeId = 0;
+    }
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -24,10 +30,7 @@ public class Shooting : NetworkBehaviour
         if (BulletCount < numberOfBullets)
         {
             ShootServerRpc();
-
-        }
-        
-       
+        } 
     }
     [ServerRpc]
     private void ShootServerRpc()
@@ -38,18 +41,29 @@ public class Shooting : NetworkBehaviour
         bullet.GetComponent<NetworkObject>().Spawn();
         Rigidbody2D rbBullet = bullet.GetComponent<Rigidbody2D>();
         float bulletSpeed = rbBullet.GetComponent<Bullet>().Speed;
+        rbBullet.GetComponent<Bullet>().bulletId=freeId;
+        freeId++;
         rbBullet.AddForce(firePoint.up * bulletSpeed, ForceMode2D.Impulse);
         BulletCount++;
+
     }
     [ServerRpc(RequireOwnership =false)]
-    public void DestroyServerRpc()
+    public void DestroyServerRpc(int bulletId)
     {
-        GameObject toDestroy = spawnedBullets[0];
-        toDestroy.GetComponent<NetworkObject>().Despawn();
-        spawnedBullets.Remove(toDestroy);
-        Destroy(toDestroy);
+
+        for (int i =0; i < spawnedBullets.Count; i++)
+        {
+            GameObject bullet = spawnedBullets[i];
+            if (bulletId == bullet.GetComponent<Bullet>().bulletId)
+            {
+                bullet.GetComponent<NetworkObject>().Despawn();
+                spawnedBullets.RemoveAt(i);
+                BulletDestroyed();
+                break;
+            }
+        }
     }
-    public void BulletDestroyed()
+private void BulletDestroyed()
     {
         BulletCount--;
     }

@@ -21,6 +21,7 @@ public class SpawnPosition : NetworkBehaviour
     }
     public Vector2 GetSpawnPoint()
     {
+        if(copySpawnPoints.Count <= 0) { copySpawnPoints = new List<Transform>(spawnPoints); }
         int i = Random.Range(0, copySpawnPoints.Count);
         Vector2 spawnPoint= copySpawnPoints[i].position;
         copySpawnPoints.Remove(copySpawnPoints[i]);

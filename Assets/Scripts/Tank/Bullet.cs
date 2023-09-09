@@ -7,8 +7,9 @@ public class Bullet : NetworkBehaviour,IDesctructeble
     public float BulletLife=7f;
     public float Timer;
     private Rigidbody2D rb;
-   public  Vector3 lastDirection;
+    public  Vector3 lastDirection;
     public Shooting parent;
+    public int bulletId;
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -19,8 +20,8 @@ public class Bullet : NetworkBehaviour,IDesctructeble
         Timer += Time.deltaTime;
         if (Timer > BulletLife)
         {
-            Destroy(gameObject);
-            parent.GetComponent<Shooting>().BulletDestroyed();
+            Destroying();
+
         }
 
     }
@@ -38,13 +39,12 @@ public class Bullet : NetworkBehaviour,IDesctructeble
             IDesctructeble destructible = collision.collider.GetComponent<IDesctructeble>();
             destructible.Destroying();
             Destroying();
-            parent.GetComponent<Shooting>().BulletDestroyed();
+            parent.GetComponent<Shooting>().GetKill();
 
         }
         else if (collision.collider.CompareTag("Bullet")){
-            Destroy(this.gameObject);
-            Destroy(collision.gameObject);
-            parent.GetComponent<Shooting>().BulletDestroyed();
+
+            Destroying();
         }
         else
             return;
@@ -52,8 +52,7 @@ public class Bullet : NetworkBehaviour,IDesctructeble
     public void Destroying()
     {
         if(!IsOwner) return;
-        //Destroy(this.gameObject);
-        parent.DestroyServerRpc();
+        parent.GetComponent<Shooting>().DestroyServerRpc(bulletId);
     }
 
 }

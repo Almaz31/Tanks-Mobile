@@ -158,6 +158,10 @@ public static TanksMobileMultiplayer Instance { get; private set; }
         }
         return -1;
     }
+    public int GetNumberOfPlayers()
+    {
+        return playerDataNetworkList.Count;
+    }
     public PlayerData GetPlayerData()
     {
        return GetPlayerDataFromClientId( NetworkManager.Singleton.LocalClientId);

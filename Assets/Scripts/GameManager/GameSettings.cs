@@ -43,5 +43,7 @@ public class GameSettings : NetworkBehaviour
         OnGettingKill?.Invoke(this, EventArgs.Empty);
         PlayerData playerData = TanksMobileMultiplayer.Instance.GetPlayerDataFromClientId(playerId);
         playerData.playerKills++;
+        GameRules.Instance.SomeoneWasKilled();
+        Debug.Log(playerData.playerKills);
     }
 }

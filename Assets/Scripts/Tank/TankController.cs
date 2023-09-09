@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,18 +14,16 @@ public class TankController : NetworkBehaviour, IDesctructeble
     public FloatingJoystick joystick;
 
     [Header("Rotation")]
-    public float speedRotation = 5f;
-    public float toleranceAngle;
+    public float speedRotation = 10f;
 
     [Header("Fire")]
     public Transform firePoint;
 
-    [Header("Animation")]
-    public Animator anim;
+    [Header("Visual")]
+    [SerializeField] private Animator anim;
+    [SerializeField] private PlayerVisual playerVisual;
     private bool isAnimating;
 
-    [Header("Vision")]
-    [SerializeField] private PlayerVisual playerVisual;
 
     // Start is called before the first frame update
     void Start()
@@ -36,10 +35,9 @@ public class TankController : NetworkBehaviour, IDesctructeble
             if (joystick == null)
                 joystick = FindObjectOfType<FloatingJoystick>().GetComponent<FloatingJoystick>();
         }
-        PlayerData playerData = TanksMobileMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
-        playerVisual.SetPlayerColor(TanksMobileMultiplayer.Instance.GetPlayerColor(playerData.colorId));
-    }
 
+        SetPlayerColor();
+    }
     // Update is called once per frame
     void Update()
     {
@@ -52,8 +50,9 @@ public class TankController : NetworkBehaviour, IDesctructeble
             rb.velocity = Vector2.zero;
             return;
         }
-        // Move();
+       
         HandleMovementServerAuth();
+        
     }
 
     private void HandleMovementServerAuth()
@@ -84,41 +83,9 @@ public class TankController : NetworkBehaviour, IDesctructeble
         {
             transform.rotation = transform.rotation;
         }
+        rb.velocity = direction * Speed;
     }
-    public void Move()
-    {
-        Vector2 direction;
-        if (IsMobile.instance.isMobile)
-        {
-            direction = Vector2.up * joystick.Vertical + Vector2.right * joystick.Horizontal;
-        }
-        else
-        {
-            direction = Vector2.up * Input.GetAxis("Vertical") + Vector2.right * Input.GetAxis("Horizontal");
-        }
-
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90;
-        Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
-        Quaternion currentRotation = transform.rotation;
-        if (direction != Vector2.zero)
-        {
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, speedRotation * Time.deltaTime);
-        }
-        else
-        {
-            transform.rotation = transform.rotation;
-        }
-
-        if (Quaternion.Angle(currentRotation, targetRotation) <= toleranceAngle)
-        {
-            rb.velocity = direction * Speed;
-        }
-        else
-        {
-            rb.velocity = Vector2.zero;
-        }
-
-    }
+   
     public void Destroying()
     {
         
@@ -146,6 +113,12 @@ public class TankController : NetworkBehaviour, IDesctructeble
     {
         GetComponent<NetworkObject>().Despawn(gameObject);
         Destroy(gameObject);
+    }
+
+    public void SetPlayerColor()
+    {
+        PlayerData playerData = TanksMobileMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
+        playerVisual.SetPlayerColor(TanksMobileMultiplayer.Instance.GetPlayerColor(playerData.colorId));    
     }
 
 
